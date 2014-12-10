@@ -85,12 +85,37 @@ if __name__ == '__main__':
         sim.Population(n_msns, cellclass, neuron_parameters)
         for i in xrange(m_actions)]
 
+    # Striatum D2->D2 and D1->D1 lateral inhibition
+    for lat_inh_source in xrange(m_actions):
+        for lat_inh_target in xrange(m_actions):
+            if lat_inh_source == lat_inh_target:
+                continue
+            sim.Projection(
+                striatum_d1[lat_inh_source],
+                striatum_d1[lat_inh_target],
+                sim.FixedProbabilityConnector(
+                    d1_lat_inh_prob,
+                    weights=d1_lat_inh_weight,
+                    delays=d1_lat_inh_delay),
+                target="inhibitory",
+                label="d1_lateral_inhibition_{}_{}".format(
+                    lat_inh_source, lat_inh_target))
+            sim.Projection(
+                striatum_d2[lat_inh_source],
+                striatum_d2[lat_inh_target],
+                sim.FixedProbabilityConnector(
+                    d2_lat_inh_prob,
+                    weights=d2_lat_inh_weight,
+                    delays=d2_lat_inh_delay),
+                target="inhibitory",
+                label="d2_lateral_inhibition_{}_{}".format(
+                    lat_inh_source, lat_inh_target))
+
     striatum_assembly = sim.Assembly(
         *(striatum_d1 + striatum_d2),
         label="STRIATUM")
 
-    # TODO: cortex - striatum connection, all-to-all using loaded weights
-
+    # cortex - striatum connection, all-to-all using loaded weights
     sim.Projection(
         cortex_assembly,
         striatum_assembly,
@@ -103,9 +128,9 @@ if __name__ == '__main__':
         ]
     gpi_assembly = sim.Assembly(
         *gpi,
-        label="GPI")
+        label="GPi")
 
-    # external Poisson input to GPI
+    # external Poisson input to GPi
     gpi_input = sim.Population(
         m_actions * n_gpi,
         sim.SpikeSourcePoisson,
@@ -162,7 +187,7 @@ if __name__ == '__main__':
 #all to all cortex to striatum for both D1 and D2 populations
 #"plastic weights"
 
-#lateral inhibition D2-D2 and D1-D1 
+#lateral inhibition D2-D2 and D1-D1
 #static weights
 
 #D1[m] --> GPi[m] positive static weight
