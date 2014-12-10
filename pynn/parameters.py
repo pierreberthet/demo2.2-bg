@@ -32,6 +32,13 @@ d1_lat_inh_delay = 1.
 d2_lat_inh_delay = 1.
 
 
+# TODO: set remaining neuron parameters to non-default values:
+# original parameters:
+# Cm = 250.
+# Vreset = -75.
+# Vth = -50.
+# gL = 16.666
+
 neuron_parameters = {
     'cm': 0.25,                    # nF
     'e_rev_E': 0.0,
