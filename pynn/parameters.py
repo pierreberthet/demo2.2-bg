@@ -9,6 +9,13 @@ active_state_rate = 1600.     # stimulus rate for active cortex neurons, in Hz
 n_states = 3    #number of  states
 m_actions = 3   #number of  actions
 
+
+
+n_trials = 20   #number of trials per block
+n_blocks = 30   #number of blocks
+
+
+
 n_cortex_cells = 50
 n_msns = 30
 n_gpi = 10
@@ -30,6 +37,15 @@ d1_lat_inh_weight = 2e-3
 d2_lat_inh_weight = 2e-3
 d1_lat_inh_delay = 1.
 d2_lat_inh_delay = 1.
+
+ctx_strd1_delay = 1.
+ctx_strd2_delay = 1.
+
+
+
+
+change = .3 #fixed value for the weight update
+
 
 
 # TODO: set remaining neuron parameters to non-default values:
@@ -57,3 +73,4 @@ neuron_parameters = {
 sim_duration = 1000.
 time_step = 0.1
 
+conn_filename = "full_conn_list.dat"
