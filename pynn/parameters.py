@@ -18,6 +18,12 @@ cortex_input_weight = 5e-3          # nS
 gpi_external_rate = 1000.      # external input rate for GPI, in Hz
 gpi_external_weight = 0.1e-3    # external weight for GPI, in uS
 
+d1_gpi_weight = 1e-3
+d2_gpi_weight = 1e-3
+# connection probabilities between individual neurons striatum - gpi
+d1_gpi_prob = 1.0
+d2_gpi_prob = 1.0
+
 neuron_parameters = {
     'cm': 0.25,                    # nF
     'e_rev_E': 0.0,

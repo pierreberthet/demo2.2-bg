@@ -5,7 +5,6 @@ import sys
 from parameters import *
 
 
-
 def save_spikes(pop_list, base_name, filename):
     for idx, pop in enumerate(pop_list):
         spikes = pop.getSpikes()
@@ -16,6 +15,8 @@ def save_spikes(pop_list, base_name, filename):
 if __name__ == '__main__':
     output_base = "out/"
     spike_count_filename = "gpi_spike_count.dat"
+
+    weight_filename = "weights.dat"    # filename, from which the cortex - striatum connections are read
 
     spike_count_full_filename = output_base + spike_count_filename
 
@@ -49,7 +50,9 @@ if __name__ == '__main__':
         *cortex,
         label="CORTEX")
 
-    # TODO: cortex input using input parameter
+    # independent Poisson input to cortex populations.
+    # /active_state/ determines, which population receives
+    # a different firing rate
     cortex_input = []
     for i in xrange(n_states):
 
@@ -63,13 +66,13 @@ if __name__ == '__main__':
             sim.SpikeSourcePoisson,
             {'rate': rate},
             label="poisson_iput_" + str(i))
-        cortex_input.append(new_input)
         sim.Projection(
             new_input,
             cortex[i],
             sim.OneToOneConnector(
                 weights=cortex_input_weight))
-        
+
+        cortex_input.append(new_input)
 
     # striatum:
     # exciatatory populations
@@ -88,6 +91,12 @@ if __name__ == '__main__':
 
     # TODO: cortex - striatum connection, all-to-all using loaded weights
 
+    sim.Projection(
+        cortex_assembly,
+        striatum_assembly,
+        sim.FromFileConnector(
+            weight_filename))
+
     gpi = [
         sim.Population(n_gpi, cellclass, neuron_parameters)
         for i in xrange(m_actions)
@@ -96,19 +105,33 @@ if __name__ == '__main__':
         *gpi,
         label="GPI")
 
+    # external Poisson input to GPI
     gpi_input = sim.Population(
         m_actions * n_gpi,
         sim.SpikeSourcePoisson,
         dict(
             duration=sim_duration,
             rate=gpi_external_rate,
-            start=0.))
-
+            start=0.),
+        label="GPI_EXT_INPUT")
     sim.Projection(
         gpi_input,
         gpi_assembly,
         sim.OneToOneConnector(
             weights=gpi_external_weight))
+
+    # striatum - gpi connections
+    for i in xrange(m_actions):
+        sim.Projection(
+            striatum_d1[i],
+            gpi[i],
+            sim.FixedProbabilityConnector(d1_gpi_prob, weights=d1_gpi_weight))
+
+        sim.Projection(
+            striatum_d2[i],
+            gpi[i],
+            sim.FixedProbabilityConnector(d2_gpi_prob, weights=d2_gpi_weight),
+            target="inhibitory")
 
     cortex_assembly.record()
     striatum_assembly.record()
