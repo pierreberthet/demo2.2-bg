@@ -102,25 +102,38 @@ def set_state(i_state):
 
 def update_weights(i_state,  spike_trains):
     #Update the weights based on the state and the output spike trains
+    #TODO convert C code to python
     #TODO  reward function that computes the reward given the curernt state and the selected action
     #TODO  store weights value for all the trials
     #TODO  decide how to set kappa and how to artificially increase the traces of the selected action
     #TODO  update function
 
-    zi_ += (spike_height * yi_ - zi_ + epsilon_ ) * resolution / taui_;
-    zj_ += (K_ < 0) ? (1./1000.0 - yj_/fmax_ - zj_ + epsilon_)
-                * resolution / tauj_  : (spike_height * yj_ - zj_ + epsilon_ ) * resolution / tauj_;
+    
+    #local
+    ##########
+    epsilon =.0001
+    #spike_height
+    #initial value for the traces
+    resolution = 1.
+    fmax = 30.
+    taui_ = 5.
+    tauj_ = 6.
+    taue_ = 50.
+    taup_ = 200.
 
+    # Primary synaptic traces
+    zi_ += (spike_height * yi_ - zi_ + epsilon_ ) * resolution / taui_
+    zj_ += (K_ < 0) ? (1./1000.0 - yj_/fmax_ - zj_ + epsilon_) * resolution / tauj_  : (spike_height * yj_ - zj_ + epsilon_ ) * resolution / tauj_
 
-    /* Secondary synaptic traces */
-    ei_  += (zi_ - ei_) * resolution / taue_;
-    ej_  += (zj_ - ej_) * resolution / taue_;
-    eij_ += (zi_ * zj_ - eij_) * resolution / taue_;
+    # Secondary synaptic traces
+    ei_  += (zi_ - ei_) * resolution / taue_
+    ej_  += (zj_ - ej_) * resolution / taue_
+    eij_ += (zi_ * zj_ - eij_) * resolution / taue_
 
-    /* Tertiary synaptic traces. Commented is from Wahlgren paper. */
-    pi_  +=std::abs( K_) * (ei_ - pi_) * resolution / taup_/* * eij_*/;
-    pj_  +=std::abs( K_) * (ej_ - pj_) * resolution / taup_/* * eij_*/;
-    pij_ +=std::abs( K_ )* (eij_ - pij_) * resolution / taup_/* * eij_*/;
+    # Tertiary synaptic traces. Commented is from Wahlgren paper. */
+    pi_  +=std::abs( K_) * (ei_ - pi_) * resolution / taup_/* * eij_*/
+    pj_  +=std::abs( K_) * (ej_ - pj_) * resolution / taup_/* * eij_*/
+    pij_ +=std::abs( K_ )* (eij_ - pij_) * resolution / taup_/* * eij_*/
 
 
 
