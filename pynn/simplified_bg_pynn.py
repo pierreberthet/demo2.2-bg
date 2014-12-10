@@ -2,42 +2,8 @@ import pyNN.neuron as sim
 import numpy as np
 import sys
 
-# TODO: move to parameters file
-inactive_state_rate = 1000.
-active_state_rate = 1600.
+from parameters import *
 
-# #############
-#  PARAMETERS
-# #############
-n_states = 3    #number of  states
-m_actions = 3   #number of  actions
-
-n_cortex_cells = 50
-n_msns = 30
-n_gpi = 10
-
-cortex_input_weight = 5e-3          # nS
-
-gpi_external_rate = 1000.      # external input rate for GPI, in Hz
-gpi_external_weight = 0.1e-3    # external weight for GPI, in uS
-
-neuron_parameters = {
-    'cm': 1.0,
-    'e_rev_E': 0.0,
-    'e_rev_I': -70.0,
-    'i_offset': 0.0,
-    'tau_m': 20.0,
-    'tau_refrac': 0.1,
-    'tau_syn_E': 5.0,
-    'tau_syn_I': 5.0,
-    'v_reset': -65.0,
-    'v_rest': -65.0,
-    'v_thresh': -50.0
-    }
-
-
-sim_duration = 1000.
-time_step = 0.1
 
 
 def save_spikes(pop_list, base_name, filename):
@@ -50,6 +16,8 @@ def save_spikes(pop_list, base_name, filename):
 if __name__ == '__main__':
     output_base = "out/"
     spike_count_filename = "gpi_spike_count.dat"
+
+    spike_count_full_filename = output_base + spike_count_filename
 
     active_state = int(sys.argv[1])
 
@@ -155,7 +123,7 @@ if __name__ == '__main__':
 
     output_rates = np.array(
         [len(i.getSpikes()) for i in gpi])
-    np.savetxt(output_base + spike_count_filename, output_rates)
+    np.savetxt(spike_count_full_filename, output_rates)
     sim.end()
 
 
