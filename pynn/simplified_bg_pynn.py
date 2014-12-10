@@ -24,6 +24,9 @@ if __name__ == '__main__':
 
     #Model of the basal ganglia D1 and D1 pathways. States and actions are populations coded.
 
+    import pyNN
+    pyNN.utility.init_logging(None, debug=True)
+
     sim.setup(time_step)
 
     # cell class for all neurons in the network
@@ -43,7 +46,7 @@ if __name__ == '__main__':
 
 
     cortex = [
-        sim.Population(n_cortex_cells, cellclass, neuron_parameters)
+        sim.Population(n_cortex_cells, cellclass, neuron_parameters, label="CORTEX_{}".format(i))
         for i in xrange(n_states)]
 
     cortex_assembly = sim.Assembly(
@@ -65,7 +68,7 @@ if __name__ == '__main__':
             n_cortex_cells,
             sim.SpikeSourcePoisson,
             {'rate': rate},
-            label="poisson_iput_" + str(i))
+            label="STATE_INPUT_" + str(i))
         sim.Projection(
             new_input,
             cortex[i],
@@ -77,12 +80,12 @@ if __name__ == '__main__':
     # striatum:
     # exciatatory populations
     striatum_d1 = [
-        sim.Population(n_msns, cellclass, neuron_parameters)
+        sim.Population(n_msns, cellclass, neuron_parameters, label="D1_{}".format(i))
         for i in xrange(m_actions)]
 
     # inhibitory populations
     striatum_d2 = [
-        sim.Population(n_msns, cellclass, neuron_parameters)
+        sim.Population(n_msns, cellclass, neuron_parameters, label="D2_{}".format(i))
         for i in xrange(m_actions)]
 
     # Striatum D2->D2 and D1->D1 lateral inhibition
@@ -123,7 +126,8 @@ if __name__ == '__main__':
             weight_filename))
 
     gpi = [
-        sim.Population(n_gpi, cellclass, neuron_parameters)
+        sim.Population(n_gpi, cellclass, neuron_parameters,
+                       label="GPI_{}".format(i))
         for i in xrange(m_actions)
         ]
     gpi_assembly = sim.Assembly(
