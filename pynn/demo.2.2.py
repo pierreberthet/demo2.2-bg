@@ -15,6 +15,11 @@ n_cortex_cells = 50
 n_msns 	= 30
 n_gpi 	= 10
 
+Cm = 250.
+Vreset = -75.
+Vth = -50.
+gL = 16.666
+
 
 #neurons models and parameters
 
