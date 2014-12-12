@@ -9,10 +9,6 @@ from parameters import *
 # ####################################################
 
 
-
-
-
-
 def offline_update(i_state, block,  spike_count_full_filename):
     
     #Update the weights based on the state and the output spike trains
@@ -95,6 +91,8 @@ def update_weights(state, action, pathway):
             #temp[:,2] = temp[:,2]/sum(temp[2,:])   #normalize values
             np.savext(pathway+"_state"+str(s)+"_to_action"+str(action)+".dat",temp )
 
+    make_single_file()
+
     return
 
 
@@ -139,18 +137,11 @@ def got_reward(state, action, block):
     return rew
 
 
-
-
-
-
 # ###########################
 #
 #        DESCRIPTION
 #
 #############################
-
-
-
 
 #?assemblies of n_actions populations or dictionnary of populations?
 #STRIATUM 2 populations of M actions, D1 and D2
@@ -217,10 +208,3 @@ def got_reward(state, action, block):
 #    sim.set_poisson(i_state, active_state_rate)
 #
 #    return
-
-
-
-
-
-
-
