@@ -3,16 +3,16 @@
 # #############
 
 
-inactive_state_rate = 1000.   # stimulus rate for inactive cortex neurons, in Hz
-active_state_rate = 1600.     # stimulus rate for active cortex neurons, in Hz
+inactive_state_rate = 500.   # stimulus rate for inactive cortex neurons, in Hz
+active_state_rate = 800.     # stimulus rate for active cortex neurons, in Hz
 
 n_states = 3    #number of  states
 m_actions = 3   #number of  actions
 
+initial_state = 0
 
-
-n_trials = 20   #number of trials per block
-n_blocks = 30   #number of blocks
+n_trials = 10   #number of trials per block
+n_blocks = 1   #number of blocks
 
 
 
@@ -20,13 +20,18 @@ n_cortex_cells = 50
 n_msns = 30
 n_gpi = 10
 
-cortex_input_weight = 5e-3          # uS
+cortex_input_weight = .1e-3          # uS
+#cortex_input_weight = 5.            # uS
+cortex_input_delay = 1.             # ms
 
-gpi_external_rate = 1000.      # external input rate for GPI, in Hz
-gpi_external_weight = 0.1e-3    # external weight for GPI, in uS
+gpi_external_rate = 800.       # external input rate for GPI, in Hz
+gpi_external_weight = 2.e-3    # external weight for GPI, in uS
+gpi_external_delay = 1.         # external delay for GPI, in mS
 
 d1_gpi_weight = 1e-3
 d2_gpi_weight = 1e-3
+d1_gpi_delay = 1.
+d2_gpi_delay = 1.
 # connection probabilities between individual neurons striatum - gpi
 d1_gpi_prob = 1.0
 d2_gpi_prob = 1.0
@@ -70,7 +75,10 @@ neuron_parameters = {
     }
 
 
-sim_duration = 1000.
+sim_duration = 100
+#sim_duration = 1000
 time_step = 0.1
 
 conn_filename = "full_conn_list.dat"
+spike_gpi_fn = "out/gpi_spike_count.dat"
+reward_fn = "out/reward.txt"

@@ -1,19 +1,24 @@
 import pyNN.nest as sim
 #import pyNN.neuron as sim
+import pyNN.utility
 import numpy as np
 import sys
 
 from parameters import *
-
+from matplotlib import pyplot as plt
 
 def save_spikes(pop_list, base_name, filename):
     for idx, pop in enumerate(pop_list):
+        print idx, pop
         spikes = pop.getSpikes()
+        print 'spikes', spikes.list_units
+        print "////", spikes.list_recordingchannels
         fname = base_name + 'spikes_' + str(idx) + '_' + filename
         print "saving spikes to file:", fname, "length=", len(spikes)
         np.savetxt(fname, np.array(spikes, ndmin=2))
 
-if __name__ == '__main__':
+##if __name__ == '__main__':
+def run(a_state):
     output_base = "out/"
     spike_count_filename = "gpi_spike_count.dat"
 
@@ -21,11 +26,11 @@ if __name__ == '__main__':
 
     spike_count_full_filename = output_base + spike_count_filename
 
-    active_state = int(sys.argv[1])
+    #active_state = int(sys.argv[1])
+    active_state = a_state
 
     #Model of the basal ganglia D1 and D1 pathways. States and actions are populations coded.
 
-    import pyNN
     pyNN.utility.init_logging(None, debug=True)
 
     sim.setup(time_step)
@@ -73,8 +78,9 @@ if __name__ == '__main__':
         sim.Projection(
             new_input,
             cortex[i],
-            sim.OneToOneConnector(
-                weights=cortex_input_weight))
+            sim.OneToOneConnector(),
+            sim.StaticSynapse(weight=cortex_input_weight, delay=cortex_input_delay)
+            )
 
         cortex_input.append(new_input)
 
@@ -98,20 +104,22 @@ if __name__ == '__main__':
                 striatum_d1[lat_inh_source],
                 striatum_d1[lat_inh_target],
                 sim.FixedProbabilityConnector(
-                    d1_lat_inh_prob,
-                    weights=d1_lat_inh_weight,
-                    delays=d1_lat_inh_delay),
-                target="inhibitory",
+                    d1_lat_inh_prob),
+                    sim.StaticSynapse(
+                        weight=d1_lat_inh_weight,
+                        delay=d1_lat_inh_delay),
+                receptor_type="inhibitory",
                 label="d1_lateral_inhibition_{}_{}".format(
                     lat_inh_source, lat_inh_target))
             sim.Projection(
                 striatum_d2[lat_inh_source],
                 striatum_d2[lat_inh_target],
                 sim.FixedProbabilityConnector(
-                    d2_lat_inh_prob,
-                    weights=d2_lat_inh_weight,
-                    delays=d2_lat_inh_delay),
-                target="inhibitory",
+                    d2_lat_inh_prob),
+                    sim.StaticSynapse(
+                        weight=d2_lat_inh_weight,
+                        delay=d2_lat_inh_delay),
+                receptor_type="inhibitory",
                 label="d2_lateral_inhibition_{}_{}".format(
                     lat_inh_source, lat_inh_target))
 
@@ -148,37 +156,76 @@ if __name__ == '__main__':
         gpi_input,
         gpi_assembly,
         sim.OneToOneConnector(
-            weights=gpi_external_weight))
+            sim.StaticSynapse(
+                weight=gpi_external_weight,
+                delay= gpi_external_delay)))
 
     # striatum - gpi connections
     for i in xrange(m_actions):
         sim.Projection(
             striatum_d1[i],
             gpi[i],
-            sim.FixedProbabilityConnector(d1_gpi_prob, weights=d1_gpi_weight))
+            sim.FixedProbabilityConnector(d1_gpi_prob), 
+            sim.StaticSynapse( weight=d1_gpi_weight, delay = d1_gpi_delay))
 
         sim.Projection(
             striatum_d2[i],
             gpi[i],
-            sim.FixedProbabilityConnector(d2_gpi_prob, weights=d2_gpi_weight),
-            target="inhibitory")
+            sim.FixedProbabilityConnector(d2_gpi_prob),
+            sim.StaticSynapse(weight=d2_gpi_weight, delay=d2_gpi_delay),
+            #target="inhibitory")
+            receptor_type="inhibitory")
 
-    cortex_assembly.record()
-    striatum_assembly.record()
-    gpi_assembly.record()
+    cortex_assembly.record('spikes')
+    striatum_assembly.record('spikes')
+    gpi_assembly.record('spikes')
 
 
     sim.run(sim_duration)
-
-    save_spikes(cortex, output_base, "cortex.dat")
-    save_spikes(striatum_d1, output_base, "striatum_d1.dat")
-    save_spikes(striatum_d2, output_base, "striatum_d2.dat")
-    save_spikes(gpi, output_base, "striatum.dat")
-
-    output_rates = np.array(
-        [len(i.getSpikes()) for i in gpi])
-    np.savetxt(spike_count_full_filename, output_rates)
     sim.end()
+    
+    label = "CORTEX_0" 
+    #print 'cortex get pop', cortex_assembly.get_population(label)
+    #print 'cortex describe', cortex_assembly.describe()
+    #cortex_assembly.write_data("spikes")
+    #cortex_assembly.get_population(label).write_data("spikes")
+    #spikes = gpi_assembly  #get_data("spikes", gather=True)
+   # print "getdata spikes", spikes
+   # print 'spikes.segment', spikes.segments
+    #print 'spikes.segments.SpikeTrains', spikes.segments.spike
+
+    #save_spikes(cortex_assembly, output_base, "cortex.dat")
+    #save_spikes(striatum_d1, output_base, "striatum_d1.dat")
+    #save_spikes(striatum_d2, output_base, "striatum_d2.dat")
+    #save_spikes(gpi, output_base, "gpi.dat")
+
+    #output_rates = np.array(
+    #    [len(i.getSpikes()) for i in gpi])
+    #np.savetxt(spike_count_full_filename, output_rates)
+    
+   # for seg in cortex_assembly.segments:
+   #     print("Analyzing segment %d" % seg.index)
+   #     stlist = [st - st.t_start for st in seg.spiketrains]
+   #     plt.figure()
+   #     count, bins = np.histogram(stlist)
+   #     plt.bar(bins[:-1], count, width=bins[1] - bins[0])
+   #     plt.title("PSTH in segment %d" % seg.index)
+    cortex_mean_spikes = np.zeros(n_states)
+    gpi_mean_spikes = np.zeros(m_actions)
+    d1_mean_spikes = np.zeros(m_actions)
+    d2_mean_spikes = np.zeros(m_actions)
+    for i in xrange(n_states):
+        cortex_mean_spikes[i] = cortex_assembly.get_population("CORTEX_"+str(i)).mean_spike_count()
+    for i in xrange(m_actions):
+        gpi_mean_spikes[i] = gpi_assembly.get_population("GPI_"+str(i)).mean_spike_count()
+        d1_mean_spikes[i] = striatum_assembly.get_population("D1_"+str(i)).mean_spike_count()
+        d2_mean_spikes[i] = striatum_assembly.get_population("D2_"+str(i)).mean_spike_count()
+
+    print 'CORTEX ', cortex_mean_spikes
+    print 'D1', d1_mean_spikes
+    print 'D2', d2_mean_spikes
+
+    return gpi_mean_spikes
 
 
 # #############

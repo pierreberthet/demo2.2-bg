@@ -9,7 +9,7 @@ from parameters import *
 # ####################################################
 
 
-def offline_update(i_state, block,  spike_count_full_filename):
+def offline_update(i_state, i_action, block):
     
     #Update the weights based on the state and the output spike trains
     #TODO  convert C code to python
@@ -55,18 +55,20 @@ def offline_update(i_state, block,  spike_count_full_filename):
     #INITAL TEST
     #TODO softmax implementation
 
-    output_rates = np.loadtxt(spike_count_full_filename)
-    i_action = np.argmax(output_rates)
+    #output_rates = np.loadtxt(spike_count_full_filename)
+    #output_rates = np.loadtxt(spike_gpi_fn)
+    #i_action = np.argmax(output_rates)
 
+    rew = 0
     #conn_list = (pre_idx, post_idx, weight, delay)
     if got_reward(i_state, i_action, block):
         #increase D1 weights of selected action
        	update_weights(i_state, i_action, 'D1')
+        rew = 1
     else:
        	#increase D2 weights of selected action
        	update_weights(i_state, i_action, 'D2')
-
-    return
+    return rew
 
 
 def update_weights(state, action, pathway):
@@ -81,7 +83,7 @@ def update_weights(state, action, pathway):
             #decrease weights
             temp[:,2]-= change/(n_states-1.)
         #temp[:,2] = temp[:,2]/sum(temp[2,:])   #normalize values
-        np.savext(pathway+"_state"+str(s)+"_to_action"+str(action)+".dat",temp )
+        np.savetxt(pathway+"_state"+str(s)+"_to_action"+str(action)+".dat",temp )
 
     for a in xrange(m_actions):
         if a!=action:
@@ -89,7 +91,7 @@ def update_weights(state, action, pathway):
             #decrease weights
             temp[:,2] -= change/(n_states-1.)
             #temp[:,2] = temp[:,2]/sum(temp[2,:])   #normalize values
-            np.savext(pathway+"_state"+str(s)+"_to_action"+str(action)+".dat",temp )
+            np.savetxt(pathway+"_state"+str(s)+"_to_action"+str(action)+".dat",temp )
 
     make_single_file()
 
@@ -117,6 +119,7 @@ def init_weights(n_states, m_actions):
     make_single_file()
 
     return
+
 
 def make_single_file():
     #merge all the connections files into one
