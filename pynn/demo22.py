@@ -109,7 +109,7 @@ def init_weights(n_states, m_actions):
             delay = ctx_strd2_delay
         for s in xrange(n_states):
             for a in xrange(m_actions):
-                w = np.ones((n_cortex_cells, n_msns))*1.  	 #to change: implement variability
+                w = np.ones((n_cortex_cells, n_msns))*1.e-03  	 #to change: implement variability
                 conn_list = []
                 for pre in xrange(n_cortex_cells):
 		            for post in xrange(n_msns):

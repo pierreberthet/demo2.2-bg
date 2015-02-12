@@ -45,8 +45,12 @@ print 'REWARD = ', reward
 
 plt.figure(101)
 plt.plot(reward)
-plt.show()
 
+plt.figure(102)
+plt.plot(np.loadtxt("full_conn_list.dat")[:,2])
+
+
+plt.show()
 
 
 

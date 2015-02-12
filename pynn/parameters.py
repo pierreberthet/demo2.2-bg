@@ -24,12 +24,12 @@ cortex_input_weight = .1e-3          # uS
 #cortex_input_weight = 5.            # uS
 cortex_input_delay = 1.             # ms
 
-gpi_external_rate = 800.       # external input rate for GPI, in Hz
-gpi_external_weight = 2.e-3    # external weight for GPI, in uS
+gpi_external_rate = 8000.       # external input rate for GPI, in Hz
+gpi_external_weight = 50000.e-3    # external weight for GPI, in uS
 gpi_external_delay = 1.         # external delay for GPI, in mS
 
-d1_gpi_weight = 1e-3
-d2_gpi_weight = 1e-3
+d1_gpi_weight = .1e-3
+d2_gpi_weight = .1e-3
 d1_gpi_delay = 1.
 d2_gpi_delay = 1.
 # connection probabilities between individual neurons striatum - gpi
@@ -38,8 +38,8 @@ d2_gpi_prob = 1.0
 
 d1_lat_inh_prob = 0.3
 d2_lat_inh_prob = 0.3
-d1_lat_inh_weight = 2e-3
-d2_lat_inh_weight = 2e-3
+d1_lat_inh_weight = .2e-3
+d2_lat_inh_weight = .2e-3
 d1_lat_inh_delay = 1.
 d2_lat_inh_delay = 1.
 
@@ -49,7 +49,7 @@ ctx_strd2_delay = 1.
 
 
 
-change = .3 #fixed value for the weight update
+change = .1e-03 #fixed value for the weight update
 
 
 
