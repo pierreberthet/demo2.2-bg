@@ -11,13 +11,13 @@ m_actions = 3   #number of  actions
 
 initial_state = 0
 
-n_trials = 10   #number of trials per block
-n_blocks = 1   #number of blocks
+n_trials = 20   #number of trials per block
+n_blocks = 3   #number of blocks
 
 
 
 n_cortex_cells = 50
-n_msns = 30
+n_msns = 20
 n_gpi = 10
 
 cortex_input_weight = .1e-3          # uS
@@ -26,19 +26,22 @@ cortex_input_delay = 1.             # ms
 
 
 #initial_weight_value =  1.e-03      # uS    initial weight value of the cortico-stratal connections, D1 and D2
-
+learning_rate = .2 #.5e-01
+w_uplimit= 2.e-03
+w_lowlimit= 1.e-04
 wd1 = 1.e-03    # uS
 wd2 = 1.e-03    # uS
-std_wd1 = 1.e-04
-std_wd2 = 1.e-04
+std_wd1 = 1.e-4
+std_wd2 = 1.e-4
 
+change = .1e-03 #fixed value for the weight update
 
 gpi_external_rate = 800.       # external input rate for GPI, in Hz
 gpi_external_weight = .4e-3    # external weight for GPI, in uS
 gpi_external_delay = 1.         # external delay for GPI, in mS
 
-d1_gpi_weight = .1e-3
-d2_gpi_weight = .1e-3
+d1_gpi_weight = 2.e-4
+d2_gpi_weight = 10.e-4
 d1_gpi_delay = 1.
 d2_gpi_delay = 1.
 # connection probabilities between individual neurons striatum - gpi
@@ -56,12 +59,6 @@ ctx_strd1_delay = 1.
 ctx_strd2_delay = 1.
 std_ctx_strd1_delay = .1
 std_ctx_strd2_delay = .1
-
-
-
-
-change = .1e-03 #fixed value for the weight update
-
 
 
 # TODO: set remaining neuron parameters to non-default values:

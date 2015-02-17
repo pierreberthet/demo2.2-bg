@@ -64,10 +64,12 @@ def offline_update(i_state, i_action, block):
     #conn_list = (pre_idx, post_idx, weight, delay)
     if got_reward(i_state, i_action, block):
         #increase D1 weights of selected action
-       	update_weights(i_state, i_action, 'D1')
         rew = 1
+        #print 'reward ', rew, 'D1 '
+       	update_weights(i_state, i_action, 'D1')
     else:
        	#increase D2 weights of selected action
+        #print 'reward ', rew, 'D2 ' 
        	update_weights(i_state, i_action, 'D2')
     return rew
 
@@ -79,10 +81,14 @@ def update_weights(state, action, pathway):
         temp = np.loadtxt(pathway+"_state"+str(s)+"_to_action"+str(action)+".dat")
         if s==state:
 	        #increase weights
-            temp[:,2] += change
+            #temp[:,2] += change
+            temp[:,2] += (w_uplimit - temp[:,2]) * learning_rate
+            #print 'PLUS', pathway+"_state"+str(s)+"_to_action"+str(action)
         else:
             #decrease weights
-            temp[:,2]-= change/(n_states-1.)
+            #temp[:,2]-= change/(n_states-1.)
+            temp[:,2] -= (temp[:,2]-w_lowlimit) * learning_rate
+            #print 'MINUS', pathway+"_state"+str(s)+"_to_action"+str(action)
         #temp[:,2] = temp[:,2]/sum(temp[2,:])   #normalize values
         np.savetxt(pathway+"_state"+str(s)+"_to_action"+str(action)+".dat",temp )
 
@@ -92,31 +98,33 @@ def update_weights(state, action, pathway):
             #decrease weights
             temp[:,2] -= change/(n_states-1.)
             #temp[:,2] = temp[:,2]/sum(temp[2,:])   #normalize values
-            np.savetxt(pathway+"_state"+str(s)+"_to_action"+str(action)+".dat",temp )
+            np.savetxt(pathway+"_state"+str(state)+"_to_action"+str(a)+".dat",temp )
 
     make_single_file()
-    #plt.figure(102)
-    #plt.plot(np.loadtxt("full_conn_list.dat")[:,2])
-    #
-    #
-    #plt.show()
 
     return
 
 
-def init_weights(gids_cortex, gids_d1, gids_d2):
+def init_weights():
     #initialize the weights of the cortico-striatal connections
     #TODO add weight variability
     #TODO normalize weights?
     for s in xrange(n_states):
+        #print 'S', s
         for a in xrange(m_actions):
+            #print 'A', a
             conn_list_D1 = []
             conn_list_D2 = []
-            for pre in xrange(n_cortex_cells):
-                for post in gids_d1[a]:
-                    conn_list_D1.append((pre+n_cortex_cells*s, post, np.round(np.random.normal(wd1, std_wd1),4), np.round(np.random.normal(ctx_strd1_delay, std_ctx_strd1_delay), 1)))  
-                for post in gids_d2[a]:
-                    conn_list_D2.append((pre+n_cortex_cells*s,post, np.round(np.random.normal(wd2, std_wd2),4), np.round(np.random.normal(ctx_strd2_delay, std_ctx_strd2_delay), 1)))  
+            for pre in xrange(n_cortex_cells*s, n_cortex_cells*s+n_cortex_cells):
+                #print 'pre  ', pre
+                for post in xrange(n_msns*a, n_msns*a+n_msns):  #gids_d1[a]:
+                    #print 'post ', post
+                    conn_list_D1.append((pre, post, np.round(np.random.normal(wd1, std_wd1),4), np.round(np.random.normal(ctx_strd1_delay, std_ctx_strd1_delay), 1)))  
+                    #conn_list_D1.append((pre, post, np.round(np.random.normal(wd1, std_wd1),4), np.round(np.random.normal(ctx_strd1_delay, std_ctx_strd1_delay), 1)))  
+                for post in xrange((a+m_actions)*n_msns, (a+m_actions)*n_msns+n_msns): #gids_d2[a]:
+                    #print 'post ', post
+                    conn_list_D2.append((pre, post, np.round(np.random.normal(wd2, std_wd2),4), np.round(np.random.normal(ctx_strd2_delay, std_ctx_strd2_delay), 1)))  
+                    #conn_list_D2.append((pre, post, np.round(np.random.normal(wd2, std_wd2),4), np.round(np.random.normal(ctx_strd2_delay, std_ctx_strd2_delay), 1)))  
             #for pre in gids_cortex[s]:
             #    for post in gids_d1[a]:
             #        conn_list_D1.append((pre, post, np.round(np.random.normal(wd1, std_wd1),4), np.round(np.random.normal(ctx_strd1_delay, std_ctx_strd1_delay), 1)))  
@@ -136,6 +144,7 @@ def init_weights(gids_cortex, gids_d1, gids_d2):
 
     make_single_file()
 
+    print "INIT OK"
     return
 
 
@@ -146,10 +155,20 @@ def make_single_file():
     for s in xrange(n_states):
         for pathway in {"D1", "D2"}:    
             for a in xrange(m_actions):
-	            single = np.concatenate((single, np.loadtxt(pathway+"_state"+str(s)+"_to_action"+str(a)+".dat")), axis=0)
+                tempp =np.loadtxt(pathway+"_state"+str(s)+"_to_action"+str(a)+".dat")
+                single = np.concatenate((single, tempp), axis=0)
+                #plt.scatter(tempp[:,0], tempp[:,1], label="pre "+pathway+str(s)+str(a))
+                #plt.scatter(tempp[:,1],  label="post "+pathway+str(s)+str(a))
+    
+    #plt.plot(single[:,0], single[:,1])
     single = single[1:,:]
     np.savetxt(conn_filename, single)
+    
     # columns = ["i", "j", "weight", "delay"]
+    #plt.plot(np.loadtxt("full_conn_list.dat")[:,2])
+    #plt.legend()
+    #plt.show()
+
     return
 
 
