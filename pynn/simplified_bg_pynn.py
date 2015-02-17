@@ -64,7 +64,6 @@ def run(a_state, init):
     # /active_state/ determines, which population receives
     # a different firing rate
     cortex_input = []
-    print 'hello'
     for i in xrange(n_states):
 
         if i == active_state:
@@ -77,7 +76,6 @@ def run(a_state, init):
             sim.SpikeSourcePoisson,
             {'rate': rate},
             label="STATE_INPUT_" + str(i))
-        print 'here ', i
         sim.Projection(
             new_input,
             cortex[i],
@@ -163,7 +161,7 @@ def run(a_state, init):
         striatum_assembly,
         sim.FromFileConnector(
             weight_filename))
-    print "cortico-striatal connections ok"#, cs.get('weight', format='list')
+    print "cortico-striatal connections ok", cs.get('weight', format='list')
     gpi = [
         sim.Population(n_gpi, cellclass, neuron_parameters,
                        label="GPI_{}".format(i))
