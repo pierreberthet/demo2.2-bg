@@ -122,10 +122,10 @@ def init_weights(gids_cortex, gids_d1, gids_d2):
             #        conn_list_D1.append((pre, post, np.round(np.random.normal(wd1, std_wd1),4), np.round(np.random.normal(ctx_strd1_delay, std_ctx_strd1_delay), 1)))  
             #    for post in gids_d2[a]:
             #        conn_list_D2.append((pre, post, np.round(np.random.normal(wd2, std_wd2),4), np.round(np.random.normal(ctx_strd2_delay, std_ctx_strd2_delay), 1)))  
-                        #conn_list.append((pre, post, w[i,j], ctx_strd2_delay))  
             np.savetxt("D1_state"+str(s)+"_to_action"+str(a)+".dat", conn_list_D1)
             np.savetxt("D2_state"+str(s)+"_to_action"+str(a)+".dat", conn_list_D2)
             
+           # # Old connections file, without variability in the weights and delays  
            # for pre in gids_cortex[s]:
 	       #     for post in gids_d1[a]:
 	       #         conn_list.append((pre, post, w[gids_cortex[s].index(pre), gids_d1[a].index(post)], ctx_strd1_delay))  
