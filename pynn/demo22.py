@@ -1,6 +1,7 @@
 import pyNN.nest as sim
 import numpy as np
 from parameters import *
+from matplotlib import pyplot as plt
 
 # #####################################################
 #     
@@ -94,27 +95,44 @@ def update_weights(state, action, pathway):
             np.savetxt(pathway+"_state"+str(s)+"_to_action"+str(action)+".dat",temp )
 
     make_single_file()
+    #plt.figure(102)
+    #plt.plot(np.loadtxt("full_conn_list.dat")[:,2])
+    #
+    #
+    #plt.show()
 
     return
 
 
-def init_weights(n_states, m_actions):
+def init_weights(gids_cortex, gids_d1, gids_d2):
     #initialize the weights of the cortico-striatal connections
     #TODO add weight variability
     #TODO normalize weights?
-    for pathway in {"D1", "D2"}:    
-        if pathway=="D1":
-            delay = ctx_strd1_delay 
-        else:
-            delay = ctx_strd2_delay
-        for s in xrange(n_states):
-            for a in xrange(m_actions):
-                w = np.ones((n_cortex_cells, n_msns))*1.e-03  	 #to change: implement variability
-                conn_list = []
-                for pre in xrange(n_cortex_cells):
-		            for post in xrange(n_msns):
-		                conn_list.append((pre, post, w[pre, post], delay))  
-	                    np.savetxt(pathway+"_state"+str(s)+"_to_action"+str(a)+".dat", conn_list)
+    for s in xrange(n_states):
+        for a in xrange(m_actions):
+            conn_list_D1 = []
+            conn_list_D2 = []
+            for pre in xrange(n_cortex_cells):
+                for post in gids_d1[a]:
+                    conn_list_D1.append((pre+n_cortex_cells*s, post, np.round(np.random.normal(wd1, std_wd1),4), np.round(np.random.normal(ctx_strd1_delay, std_ctx_strd1_delay), 1)))  
+                for post in gids_d2[a]:
+                    conn_list_D2.append((pre+n_cortex_cells*s,post, np.round(np.random.normal(wd2, std_wd2),4), np.round(np.random.normal(ctx_strd2_delay, std_ctx_strd2_delay), 1)))  
+            #for pre in gids_cortex[s]:
+            #    for post in gids_d1[a]:
+            #        conn_list_D1.append((pre, post, np.round(np.random.normal(wd1, std_wd1),4), np.round(np.random.normal(ctx_strd1_delay, std_ctx_strd1_delay), 1)))  
+            #    for post in gids_d2[a]:
+            #        conn_list_D2.append((pre, post, np.round(np.random.normal(wd2, std_wd2),4), np.round(np.random.normal(ctx_strd2_delay, std_ctx_strd2_delay), 1)))  
+                        #conn_list.append((pre, post, w[i,j], ctx_strd2_delay))  
+            np.savetxt("D1_state"+str(s)+"_to_action"+str(a)+".dat", conn_list_D1)
+            np.savetxt("D2_state"+str(s)+"_to_action"+str(a)+".dat", conn_list_D2)
+            
+           # for pre in gids_cortex[s]:
+	       #     for post in gids_d1[a]:
+	       #         conn_list.append((pre, post, w[gids_cortex[s].index(pre), gids_d1[a].index(post)], ctx_strd1_delay))  
+	       #         np.savetxt("D1_state"+str(s)+"_to_action"+str(a)+".dat", conn_list)
+	       #     for post in gids_d2[a]:
+	       #         conn_list.append((pre, post, w[gids_cortex[s].index(pre), gids_d2[a].index(post)], ctx_strd2_delay))  
+	       #         np.savetxt("D2_state"+str(s)+"_to_action"+str(a)+".dat", conn_list)
 
     make_single_file()
 
@@ -131,6 +149,7 @@ def make_single_file():
 	            single = np.concatenate((single, np.loadtxt(pathway+"_state"+str(s)+"_to_action"+str(a)+".dat")), axis=0)
     single = single[1:,:]
     np.savetxt(conn_filename, single)
+    # columns = ["i", "j", "weight", "delay"]
     return
 
 

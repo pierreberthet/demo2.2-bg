@@ -3,8 +3,8 @@
 # #############
 
 
-inactive_state_rate = 500.   # stimulus rate for inactive cortex neurons, in Hz
-active_state_rate = 800.     # stimulus rate for active cortex neurons, in Hz
+inactive_state_rate = 400.   # stimulus rate for inactive cortex neurons, in Hz
+active_state_rate = 1200.     # stimulus rate for active cortex neurons, in Hz
 
 n_states = 3    #number of  states
 m_actions = 3   #number of  actions
@@ -24,8 +24,17 @@ cortex_input_weight = .1e-3          # uS
 #cortex_input_weight = 5.            # uS
 cortex_input_delay = 1.             # ms
 
-gpi_external_rate = 8000.       # external input rate for GPI, in Hz
-gpi_external_weight = 50000.e-3    # external weight for GPI, in uS
+
+#initial_weight_value =  1.e-03      # uS    initial weight value of the cortico-stratal connections, D1 and D2
+
+wd1 = 1.e-03    # uS
+wd2 = 1.e-03    # uS
+std_wd1 = 1.e-04
+std_wd2 = 1.e-04
+
+
+gpi_external_rate = 800.       # external input rate for GPI, in Hz
+gpi_external_weight = .4e-3    # external weight for GPI, in uS
 gpi_external_delay = 1.         # external delay for GPI, in mS
 
 d1_gpi_weight = .1e-3
@@ -45,6 +54,8 @@ d2_lat_inh_delay = 1.
 
 ctx_strd1_delay = 1.
 ctx_strd2_delay = 1.
+std_ctx_strd1_delay = .1
+std_ctx_strd2_delay = .1
 
 
 

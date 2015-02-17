@@ -3,6 +3,7 @@ import pyNN.nest as sim
 import pyNN.utility
 import numpy as np
 import sys
+from demo22 import init_weights as init_w
 
 from parameters import *
 from matplotlib import pyplot as plt
@@ -18,7 +19,7 @@ def save_spikes(pop_list, base_name, filename):
         np.savetxt(fname, np.array(spikes, ndmin=2))
 
 ##if __name__ == '__main__':
-def run(a_state):
+def run(a_state, init):
     output_base = "out/"
     spike_count_filename = "gpi_spike_count.dat"
 
@@ -63,6 +64,7 @@ def run(a_state):
     # /active_state/ determines, which population receives
     # a different firing rate
     cortex_input = []
+    print 'hello'
     for i in xrange(n_states):
 
         if i == active_state:
@@ -75,6 +77,7 @@ def run(a_state):
             sim.SpikeSourcePoisson,
             {'rate': rate},
             label="STATE_INPUT_" + str(i))
+        print 'here ', i
         sim.Projection(
             new_input,
             cortex[i],
@@ -83,6 +86,7 @@ def run(a_state):
             )
 
         cortex_input.append(new_input)
+    print 'cortex ok'
 
     # striatum:
     # exciatatory populations
@@ -127,13 +131,39 @@ def run(a_state):
         *(striatum_d1 + striatum_d2),
         label="STRIATUM")
 
+    gids_cortex= []
+    gids_d1= []
+    gids_d2= []
+
+    for s in xrange(n_states):
+        gids_cortex.append([gid for gid in cortex_assembly.get_population("CORTEX_"+str(s)).all()])
+    for a in xrange(m_actions):
+        gids_d1.append([gid1 for gid1 in striatum_assembly.get_population("D1_"+str(a)).all()])
+        gids_d2.append([gid2 for gid2 in striatum_assembly.get_population("D2_"+str(a)).all()])
+
+
+    #for i in xrange(0,3):
+
+    #    print i, 'len cortex ', len(gids_cortex[i]), 'unique ', len(np.unique(gids_cortex[i]))
+    #    print i, 'len d1', len(gids_d1[i]), 'unique ', len(np.unique(gids_d1[i]))
+    #    print i, 'len d2', len(gids_d2[i]), 'unique ', len(np.unique(gids_d2[i]))
+    print "striatum ok"
+    
+    #for i in xrange(0,3):
+    #    print np.unique(gids_cortex[i])
+    #    gids_cortex[i][:]-=3
+
+    if init:
+        init_w(gids_cortex, gids_d1, gids_d2)
+
+     
     # cortex - striatum connection, all-to-all using loaded weights
-    sim.Projection(
+    cs = sim.Projection(
         cortex_assembly,
         striatum_assembly,
         sim.FromFileConnector(
             weight_filename))
-
+    print "cortico-striatal connections ok"#, cs.get('weight', format='list')
     gpi = [
         sim.Population(n_gpi, cellclass, neuron_parameters,
                        label="GPI_{}".format(i))
@@ -155,10 +185,11 @@ def run(a_state):
     sim.Projection(
         gpi_input,
         gpi_assembly,
-        sim.OneToOneConnector(
+        sim.OneToOneConnector(),
             sim.StaticSynapse(
                 weight=gpi_external_weight,
-                delay= gpi_external_delay)))
+                delay= gpi_external_delay))
+    print 'gpi ok'
 
     # striatum - gpi connections
     for i in xrange(m_actions):
@@ -180,7 +211,7 @@ def run(a_state):
     striatum_assembly.record('spikes')
     gpi_assembly.record('spikes')
 
-
+    print 'sim start'
     sim.run(sim_duration)
     sim.end()
     
